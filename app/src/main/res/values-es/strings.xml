@@ -27,4 +27,9 @@
 <string name="reset">Reiniciar vueltas</string>
 <string name="reset_confirm">¿Reiniciar el contador a cero?</string>
 <string name="invalid_target">Introduce una meta mayor que cero</string>
+
+<string name="pdf_section_title">Tu patrón, a la vista</string>
+<string name="pdf_purpose">Consulta las instrucciones de tu patrón PDF mientras cuentas vueltas, sin cambiar de aplicación.</string>
+<string name="pdf_help_title">¿Para qué sirve el PDF?</string>
+<string name="pdf_help_body">Si tienes un patrón de crochet guardado en PDF, ábrelo aquí. Puedes seguir sus instrucciones mientras cuentas vueltas, cambiar de página, ampliar y mover la guía rosada para marcar la línea por donde vas. El PDF permanece en tu dispositivo: la app no lo modifica ni crea nuevos PDF. Usarlo es opcional.</string>
 </resources>
