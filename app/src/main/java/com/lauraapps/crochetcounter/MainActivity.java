@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
     private String selectedId;
     private SharedPreferences prefs;
     private LinearLayout root;
-    private TextView countView, progressView, pageView;
+    private TextView countView, progressView, pageView, percentageView;
     private ProgressBar progressBar;
     private Button undoButton;
     private ImageView pdfImage;
@@ -271,14 +271,12 @@ public class MainActivity extends Activity {
 
         LinearLayout progress = card();
         LinearLayout progressRow = row();
-        progressRow.addView(styled("✦  " + getString(R.string.progress,p.rows,p.target),14,INK,true),
+        progressView = styled("✦  " + getString(R.string.progress,p.rows,p.target),14,INK,true);
+        progressRow.addView(progressView,
             new LinearLayout.LayoutParams(0,-2,1));
-        TextView pct = styled(Math.min(100,p.rows * 100L / p.target) + "%",14,PURPLE,true);
-        add(progressRow,pct);
+        percentageView = styled(Math.min(100,p.rows * 100L / p.target) + "%",14,PURPLE,true);
+        add(progressRow,percentageView);
         add(progress,progressRow);
-        progressView = text("",1,Color.TRANSPARENT);
-        progressView.setVisibility(View.GONE);
-        add(progress,progressView);
         progressBar = new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(1000);
         progressBar.setProgressTintList(ColorStateList.valueOf(PINK));
@@ -351,7 +349,8 @@ public class MainActivity extends Activity {
     private void updateCounter() {
         Project p = current();
         if (countView != null) countView.setText(String.valueOf(p.rows));
-        if (progressView != null) progressView.setText(getString(R.string.progress, p.rows, p.target));
+        if (progressView != null) progressView.setText("✦  " + getString(R.string.progress, p.rows, p.target));
+        if (percentageView != null) percentageView.setText(Math.min(100,100L*p.rows/p.target) + "%");
         if (progressBar != null) progressBar.setProgress((int)Math.min(1000, 1000L * p.rows / p.target));
         if (undoButton != null) undoButton.setEnabled(hasUndo);
     }
