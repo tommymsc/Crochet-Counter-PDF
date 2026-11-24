@@ -32,4 +32,11 @@
 <string name="pdf_purpose">Follow the instructions in your crochet PDF while counting rows. No need to switch apps.</string>
 <string name="pdf_help_title">What is the PDF for?</string>
 <string name="pdf_help_body">If you have a crochet pattern saved as a PDF, open it here. You can read its instructions while counting rows, move between pages, zoom, and slide the pink guide to mark the line you are following. Your PDF remains on your device; the app does not edit or create PDF files. This feature is optional.</string>
+
+<string name="language_title">App language</string>
+<string name="language_system">Use device language</string>
+<string name="change_target">Change goal</string>
+<string name="goal_value">Goal: %1$d rows · Tap to edit</string>
+<string name="target_hint">Your row goal (e.g. 25)</string>
+<string name="target_explanation">Choose how many rows your project needs. Each project can have a different goal; you can change it at any time.</string>
 </resources>
