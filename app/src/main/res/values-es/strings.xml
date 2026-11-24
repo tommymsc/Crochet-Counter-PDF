@@ -39,4 +39,6 @@
 <string name="goal_value">Meta: %1$d vueltas · Toca para editar</string>
 <string name="target_hint">Tu meta de vueltas (ej.: 25)</string>
 <string name="target_explanation">Indica cuántas vueltas necesita tu tejido. Cada proyecto tiene su propia meta y puedes cambiarla cuando quieras.</string>
+<string name="header_title">Contador de Crochet</string>
+<string name="header_subtitle">Cuenta vueltas · Sigue patrones PDF</string>
 </resources>
