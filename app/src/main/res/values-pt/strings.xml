@@ -32,4 +32,11 @@
 <string name="pdf_purpose">Acompanhe sua receita em PDF enquanto conta as carreiras, sem alternar entre aplicativos.</string>
 <string name="pdf_help_title">Para que serve o PDF?</string>
 <string name="pdf_help_body">Se você tem uma receita de crochê em PDF, abra-a aqui. Acompanhe as instruções enquanto conta carreiras, mude de página, amplie e arraste a guia rosa para marcar a linha atual. O PDF continua no seu aparelho; o aplicativo não altera nem cria arquivos PDF. O uso é opcional.</string>
+
+<string name="language_title">Idioma do aplicativo</string>
+<string name="language_system">Usar idioma do aparelho</string>
+<string name="change_target">Alterar meta</string>
+<string name="goal_value">Meta: %1$d carreiras · Toque para editar</string>
+<string name="target_hint">Sua meta de carreiras (ex.: 25)</string>
+<string name="target_explanation">Escolha quantas carreiras o projeto precisa. Cada projeto tem sua própria meta e você pode alterá-la quando quiser.</string>
 </resources>
