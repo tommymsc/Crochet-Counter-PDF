@@ -261,7 +261,7 @@ public class MainActivity extends Activity {
 
         LinearLayout header = row();
         ImageView symbol = new ImageView(this);
-        symbol.setImageResource(R.mipmap.ic_launcher);
+        symbol.setImageResource(R.drawable.ic_launcher);
         symbol.setScaleType(ImageView.ScaleType.CENTER_CROP);
         symbol.setContentDescription(getString(R.string.app_name));
         header.addView(symbol,new LinearLayout.LayoutParams(dp(54),dp(54)));
