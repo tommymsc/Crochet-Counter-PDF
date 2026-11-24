@@ -39,4 +39,6 @@
 <string name="goal_value">Meta: %1$d carreiras · Toque para editar</string>
 <string name="target_hint">Sua meta de carreiras (ex.: 25)</string>
 <string name="target_explanation">Escolha quantas carreiras o projeto precisa. Cada projeto tem sua própria meta e você pode alterá-la quando quiser.</string>
+<string name="header_title">Contador de Crochê</string>
+<string name="header_subtitle">Conte carreiras · Siga receitas PDF</string>
 </resources>
