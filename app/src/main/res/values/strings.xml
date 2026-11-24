@@ -39,4 +39,6 @@
 <string name="goal_value">Goal: %1$d rows · Tap to edit</string>
 <string name="target_hint">Your row goal (e.g. 25)</string>
 <string name="target_explanation">Choose how many rows your project needs. Each project can have a different goal; you can change it at any time.</string>
+<string name="header_title">Crochet Counter</string>
+<string name="header_subtitle">Count rows · Follow PDF patterns</string>
 </resources>
