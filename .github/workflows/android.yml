@@ -29,7 +29,7 @@ jobs:
         run: gradle --no-daemon clean lintDebug assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: crochet-counter-v1.1.0-code3-modern-apk
+          name: crochet-counter-v1.1.1-code4-refined-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
