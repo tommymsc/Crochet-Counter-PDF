@@ -20,6 +20,8 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.os.Build;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,11 +37,14 @@ public class MainActivity extends Activity {
     private SharedPreferences prefs;
     private LinearLayout root;
     private TextView countView, progressView, pageView;
+    private ProgressBar progressBar;
+    private Button undoButton;
     private ImageView pdfImage;
     private FrameLayout pdfFrame;
     private PdfRenderer renderer;
     private ParcelFileDescriptor file;
     private String openedUri = "";
+    private Bitmap visiblePdfBitmap;
     private int lastValue = -1;
     private boolean hasUndo = false;
 
@@ -84,8 +89,14 @@ public class MainActivity extends Activity {
     private void load() {
         try {
             JSONArray a = new JSONArray(prefs.getString("projects", "[]"));
-            for (int i = 0; i < a.length(); i++) projects.add(Project.from(a.getJSONObject(i)));
-        } catch (Exception ignored) { projects.clear(); }
+            for (int i = 0; i < a.length(); i++) {
+                try { projects.add(Project.from(a.getJSONObject(i))); }
+                catch (Exception badEntry) { android.util.Log.w("CrochetCounter", "Skipping invalid saved project", badEntry); }
+            }
+        } catch (Exception error) {
+            android.util.Log.e("CrochetCounter", "Saved projects could not be parsed", error);
+            // Do not overwrite a malformed preferences file before recovery.
+        }
         if (projects.isEmpty()) {
             Project p = new Project(); p.name = getString(R.string.project_default);
             projects.add(p);
@@ -94,7 +105,7 @@ public class MainActivity extends Activity {
         boolean found = false;
         for (Project p : projects) if (p.id.equals(selectedId)) found = true;
         if (!found) selectedId = projects.get(0).id;
-        save();
+        if (prefs.getString("projects", null) == null) save();
     }
     private void save() {
         JSONArray a = new JSONArray();
@@ -134,14 +145,18 @@ public class MainActivity extends Activity {
         add(root, button(getString(R.string.add_row), () -> changeRows(1)));
         LinearLayout actions = new LinearLayout(this);
         actions.setOrientation(LinearLayout.HORIZONTAL);
-        Button undo = button(getString(R.string.undo), this::undo);
+        undoButton = button(getString(R.string.undo), this::undo);
+        Button minus = button("− 1", () -> changeRows(-1));
         Button reset = button(getString(R.string.reset), () -> new AlertDialog.Builder(this)
             .setMessage(R.string.reset_confirm).setPositiveButton(R.string.reset, (d,w) -> changeRows(-current().rows))
             .setNegativeButton(R.string.cancel, null).show());
-        actions.addView(undo, new LinearLayout.LayoutParams(0, -2, 1));
+        actions.addView(minus, new LinearLayout.LayoutParams(0, -2, 1));
+        actions.addView(undoButton, new LinearLayout.LayoutParams(0, -2, 1));
         actions.addView(reset, new LinearLayout.LayoutParams(0, -2, 1));
         add(root, actions);
         progressView = text("", 15, Color.DKGRAY); add(root, progressView);
+        progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        progressBar.setMax(1000); add(root, progressBar);
         add(root, button(getString(R.string.target) + ": " + p.target, this::setTarget));
         add(root, button("📄  " + getString(R.string.open_pdf), this::pickPdf));
 
@@ -174,10 +189,10 @@ public class MainActivity extends Activity {
                     Project pr = current();
                     pr.guide = Math.max(0, Math.min(1, event.getY() / Math.max(1, pdfFrame.getHeight())));
                     guideView.setTranslationY(pr.guide * Math.max(0, pdfFrame.getHeight()-dp(4)));
-                    if (event.getAction() == MotionEvent.ACTION_UP) save();
+                    // Persist on release, not for every frame of a drag.
                     return true;
                 }
-                if (event.getAction() == MotionEvent.ACTION_UP) { save(); return true; }
+                if (event.getAction() == MotionEvent.ACTION_UP) { save(); v.performClick(); return true; }
                 return true;
             });
             horizontal.addView(pdfFrame);
@@ -191,17 +206,22 @@ public class MainActivity extends Activity {
         Project p = current();
         if (countView != null) countView.setText(String.valueOf(p.rows));
         if (progressView != null) progressView.setText(getString(R.string.progress, p.rows, p.target));
+        if (progressBar != null) progressBar.setProgress((int)Math.min(1000, 1000L * p.rows / p.target));
+        if (undoButton != null) undoButton.setEnabled(hasUndo);
     }
     private void changeRows(int amount) {
         Project p = current();
+        int newRows = (int) Math.max(0, Math.min(Integer.MAX_VALUE, (long) p.rows + amount));
+        if (newRows == p.rows) return;
         lastValue = p.rows; hasUndo = true;
-        p.rows = (int) Math.max(0, Math.min(Integer.MAX_VALUE, (long) p.rows + amount));
+        p.rows = newRows;
         save(); updateCounter();
     }
     private void undo() {
         if (!hasUndo) return;
-        Project p = current(); int before = p.rows;
-        p.rows = lastValue; lastValue = before;
+        Project p = current();
+        p.rows = lastValue;
+        hasUndo = false;
         save(); updateCounter();
     }
     private void setTarget() {
@@ -295,10 +315,20 @@ public class MainActivity extends Activity {
                 float scale = Math.min(2.2f, getResources().getDisplayMetrics().widthPixels / (float) page.getWidth());
                 int w = Math.min(2400, Math.max(1, (int)(page.getWidth() * scale * p.zoom)));
                 int h = Math.min(3200, Math.max(1, (int)(page.getHeight() * scale * p.zoom)));
+                // Cap bitmap pixels to keep older phones safe from excessive PDF zoom.
+                long area = (long)w * h;
+                if (area > 4000000L) {
+                    double shrink = Math.sqrt(4000000.0 / area);
+                    w = Math.max(1, (int)(w * shrink));
+                    h = Math.max(1, (int)(h * shrink));
+                }
                 Bitmap bm = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
                 bm.eraseColor(Color.WHITE);
                 page.render(bm,null,null,PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                Bitmap previous = visiblePdfBitmap;
                 pdfImage.setImageBitmap(bm);
+                visiblePdfBitmap = bm;
+                if (previous != null && previous != bm && !previous.isRecycled()) previous.recycle();
                 ViewGroup.LayoutParams lp = pdfImage.getLayoutParams();
                 lp.width = w; lp.height = h; pdfImage.setLayoutParams(lp);
                 pdfFrame.getLayoutParams().width = w;
@@ -317,6 +347,9 @@ public class MainActivity extends Activity {
         }
     }
     private void closePdf() {
+        if (pdfImage != null) pdfImage.setImageDrawable(null);
+        if (visiblePdfBitmap != null && !visiblePdfBitmap.isRecycled()) visiblePdfBitmap.recycle();
+        visiblePdfBitmap = null;
         if (renderer != null) { try { renderer.close(); } catch (Exception ignored) {} renderer = null; }
         if (file != null) { try { file.close(); } catch (Exception ignored) {} file = null; }
         openedUri = "";
