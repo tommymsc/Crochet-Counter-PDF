@@ -27,4 +27,9 @@
 <string name="reset">Reset rows</string>
 <string name="reset_confirm">Reset row count to zero?</string>
 <string name="invalid_target">Enter a target greater than zero</string>
+
+<string name="pdf_section_title">Your pattern, right here</string>
+<string name="pdf_purpose">Follow the instructions in your crochet PDF while counting rows. No need to switch apps.</string>
+<string name="pdf_help_title">What is the PDF for?</string>
+<string name="pdf_help_body">If you have a crochet pattern saved as a PDF, open it here. You can read its instructions while counting rows, move between pages, zoom, and slide the pink guide to mark the line you are following. Your PDF remains on your device; the app does not edit or create PDF files. This feature is optional.</string>
 </resources>
