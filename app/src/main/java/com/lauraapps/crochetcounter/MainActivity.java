@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -168,9 +169,9 @@ public class MainActivity extends Activity {
     }
     private LinearLayout card() {
         LinearLayout l = stack();
-        l.setPadding(dp(18),dp(18),dp(18),dp(18));
+        l.setPadding(dp(16),dp(14),dp(16),dp(14));
         l.setBackground(shape(WHITE, Color.rgb(235,226,244), 24));
-        l.setElevation(dp(2));
+        l.setElevation(dp(1));
         return l;
     }
     private void section(LinearLayout into, View view, int top) {
@@ -186,7 +187,7 @@ public class MainActivity extends Activity {
         b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         b.setTextColor(foreground);
         b.setBackground(shape(fill,0,16));
-        b.setMinHeight(dp(54));
+        b.setMinimumHeight(dp(48));
         b.setPadding(dp(12),dp(10),dp(12),dp(10));
         b.setOnClickListener(v -> callback.run());
         return b;
@@ -205,7 +206,7 @@ public class MainActivity extends Activity {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         }
         root = stack();
-        root.setPadding(dp(18),dp(14),dp(18),dp(30));
+        root.setPadding(dp(16),dp(10),dp(16),dp(24));
         root.setBackgroundColor(LIGHT);
         ScrollView sc = new ScrollView(this);
         sc.setFillViewport(true);
@@ -219,7 +220,7 @@ public class MainActivity extends Activity {
         symbol.setBackground(shape(Color.rgb(239,226,247),0,18));
         header.addView(symbol,new LinearLayout.LayoutParams(dp(54),dp(54)));
         LinearLayout headerWords = stack();
-        add(headerWords,styled("Crochet Counter",23,INK,true));
+        add(headerWords,styled("Crochet Counter",21,INK,true));
         add(headerWords,styled("& PDF · Craft companion",12,MUTED,false));
         LinearLayout.LayoutParams words = new LinearLayout.LayoutParams(0,-2,1);
         words.leftMargin = dp(8);
@@ -236,20 +237,20 @@ public class MainActivity extends Activity {
         add(project,choose);
         projectName.setOnClickListener(v -> chooseProject());
         cap.setOnClickListener(v -> chooseProject());
-        section(root,project,20);
+        section(root,project,12);
 
         LinearLayout hero = stack();
-        hero.setPadding(dp(18),dp(22),dp(18),dp(22));
+        hero.setPadding(dp(18),dp(14),dp(18),dp(14));
         hero.setBackground(gradient(Color.rgb(110,74,164),Color.rgb(159,99,180),28));
         TextView kicker = styled(getString(R.string.rows).toUpperCase(java.util.Locale.getDefault()),14,Color.rgb(246,223,255),true);
         kicker.setGravity(Gravity.CENTER);
         add(hero,kicker);
-        countView = text("",79,WHITE);
+        countView = text("",62,WHITE);
         countView.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         countView.setGravity(Gravity.CENTER);
         add(hero,countView);
         add(hero,text("✦  " + getString(R.string.target) + ": " + p.target,15,WHITE));
-        section(root,hero,16);
+        section(root,hero,12);
 
         Button plus = action("+  " + getString(R.string.add_row).replace("+ ",""),PURPLE,WHITE,() -> {
             changeRows(1);
@@ -259,47 +260,64 @@ public class MainActivity extends Activity {
             }
         });
         plus.setTextSize(20);
-        plus.setMinHeight(dp(74));
+        plus.setMinimumHeight(dp(62));
         plus.setBackground(gradient(Color.rgb(229,91,155),Color.rgb(201,73,140),20));
-        section(root,plus,12);
+        section(root,plus,10);
 
         LinearLayout quick = row();
         addWeighted(quick,action("− 1",WHITE,INK,() -> changeRows(-1)),1,3);
         undoButton = action("↶ " + getString(R.string.undo),WHITE,PURPLE,this::undo);
         addWeighted(quick,undoButton,1,3);
-        section(root,quick,10);
+        section(root,quick,8);
 
         LinearLayout progress = card();
         LinearLayout progressRow = row();
         progressView = styled("✦  " + getString(R.string.progress,p.rows,p.target),14,INK,true);
+        progressView.setPadding(0,0,dp(4),0);
         progressRow.addView(progressView,
-            new LinearLayout.LayoutParams(0,-2,1));
+            new LinearLayout.LayoutParams(0,dp(30),1));
         percentageView = styled(Math.min(100,p.rows * 100L / p.target) + "%",14,PURPLE,true);
-        add(progressRow,percentageView);
-        add(progress,progressRow);
+        percentageView.setGravity(Gravity.CENTER);
+        percentageView.setPadding(dp(8),dp(4),dp(8),dp(4));
+        percentageView.setBackground(shape(Color.rgb(249,234,246),0,12));
+        progressRow.addView(percentageView,new LinearLayout.LayoutParams(-2,dp(30)));
+        progress.addView(progressRow,new LinearLayout.LayoutParams(-1,dp(34)));
         progressBar = new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(1000);
         progressBar.setProgressTintList(ColorStateList.valueOf(PINK));
         progressBar.setProgressBackgroundTintList(ColorStateList.valueOf(Color.rgb(240,229,245)));
-        progressBar.setMinimumHeight(dp(10));
-        section(progress,progressBar,12);
+        // Android's horizontal ProgressBar has device-dependent intrinsic height.
+        // An explicit 8dp layout height prevents it from stretching this card.
+        LinearLayout.LayoutParams barParams = new LinearLayout.LayoutParams(-1,dp(8));
+        barParams.topMargin = dp(8);
+        progress.addView(progressBar,barParams);
         LinearLayout progressBtns = row();
         addWeighted(progressBtns,action("◎  " + getString(R.string.target),Color.rgb(247,239,252),PURPLE,this::setTarget),1,2);
         addWeighted(progressBtns,action("↺  " + getString(R.string.reset),Color.rgb(247,239,252),INK,
             () -> new AlertDialog.Builder(this).setMessage(R.string.reset_confirm)
                 .setPositiveButton(R.string.reset,(d,w)->changeRows(-current().rows))
                 .setNegativeButton(R.string.cancel,null).show()),1,2);
-        section(progress,progressBtns,10);
-        section(root,progress,16);
+        section(progress,progressBtns,9);
+        section(root,progress,12);
 
         LinearLayout pdfCard = card();
-        add(pdfCard,styled("📄  " + getString(R.string.open_pdf),20,INK,true));
-        add(pdfCard,styled(getString(R.string.guide),12,MUTED,false));
+        LinearLayout pdfHeading = row();
+        TextView pdfTitle = styled("📄  " + getString(R.string.pdf_section_title),18,INK,true);
+        pdfHeading.addView(pdfTitle,new LinearLayout.LayoutParams(0,-2,1));
+        Button explain = action("ⓘ",Color.rgb(247,239,252),PURPLE,this::explainPdf);
+        explain.setContentDescription(getString(R.string.pdf_help_title));
+        explain.setMinimumHeight(dp(40));
+        pdfHeading.addView(explain,new LinearLayout.LayoutParams(dp(46),dp(40)));
+        add(pdfCard,pdfHeading);
+        TextView description = styled(getString(R.string.pdf_purpose),13,MUTED,false);
+        description.setLineSpacing(dp(2),1f);
+        add(pdfCard,description);
+        if (!p.uri.isEmpty()) add(pdfCard,styled(getString(R.string.guide),12,PURPLE,false));
         section(pdfCard,action(p.uri.isEmpty() ? "＋  " + getString(R.string.open_pdf)
             : "↻  " + getString(R.string.open_pdf),Color.rgb(240,230,248),PURPLE,this::pickPdf),10);
         if (p.uri.isEmpty()) {
             TextView empty = text(getString(R.string.no_pdf),14,MUTED);
-            empty.setPadding(dp(16),dp(20),dp(16),dp(20));
+            empty.setPadding(dp(12),dp(10),dp(12),dp(10));
             empty.setBackground(shape(Color.rgb(251,248,253),Color.rgb(239,230,244),16));
             section(pdfCard,empty,12);
         } else {
@@ -339,12 +357,19 @@ public class MainActivity extends Activity {
             horizontal.addView(pdfFrame);
             section(pdfCard,horizontal,12);
         }
-        section(root,pdfCard,16);
+        section(root,pdfCard,12);
         TextView manage = text("⚙  " + getString(R.string.delete),13,MUTED);
         manage.setOnClickListener(v->deleteProject());
         section(root,manage,14);
         updateCounter();
         if(!p.uri.isEmpty()) renderPdf();
+    }
+    private void explainPdf() {
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.pdf_help_title)
+            .setMessage(R.string.pdf_help_body)
+            .setPositiveButton(android.R.string.ok,null)
+            .show();
     }
     private void updateCounter() {
         Project p = current();
