@@ -88,6 +88,14 @@ public class MainActivity extends Activity {
             return p;
         }
     }
+    private String displayProjectName(Project p) {
+        if (p.name.equals("My first project") ||
+            p.name.equals("Mi primer proyecto") ||
+            p.name.equals("Meu primeiro projeto")) {
+            return getString(R.string.project_default);
+        }
+        return p.name;
+    }
     private Project current() {
         for (Project p : projects) if (p.id.equals(selectedId)) return p;
         return projects.get(0);
@@ -252,13 +260,14 @@ public class MainActivity extends Activity {
         setContentView(sc);
 
         LinearLayout header = row();
-        TextView symbol = styled("🧶", 29, PURPLE, true);
-        symbol.setGravity(Gravity.CENTER);
-        symbol.setBackground(shape(Color.rgb(239,226,247),0,18));
+        ImageView symbol = new ImageView(this);
+        symbol.setImageResource(R.mipmap.ic_launcher);
+        symbol.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        symbol.setContentDescription(getString(R.string.app_name));
         header.addView(symbol,new LinearLayout.LayoutParams(dp(54),dp(54)));
         LinearLayout headerWords = stack();
-        add(headerWords,styled("Crochet Counter",21,INK,true));
-        add(headerWords,styled("& PDF · Craft companion",12,MUTED,false));
+        add(headerWords,styled(getString(R.string.header_title),21,INK,true));
+        add(headerWords,styled(getString(R.string.header_subtitle),12,MUTED,false));
         LinearLayout.LayoutParams words = new LinearLayout.LayoutParams(0,-2,1);
         words.leftMargin = dp(8);
         header.addView(headerWords,words);
@@ -272,7 +281,7 @@ public class MainActivity extends Activity {
         TextView cap = styled(getString(R.string.project).toUpperCase(java.util.Locale.getDefault()),11,MUTED,true);
         add(project,cap);
         LinearLayout choose = row();
-        TextView projectName = styled(p.name + "  ▾",20,INK,true);
+        TextView projectName = styled(displayProjectName(p) + "  ▾",20,INK,true);
         choose.addView(projectName,new LinearLayout.LayoutParams(0,-2,1));
         addWeighted(choose,action("＋",Color.rgb(244,230,248),PURPLE,this::newProject),.23f,0);
         add(project,choose);
@@ -480,7 +489,7 @@ public class MainActivity extends Activity {
     }
     private void chooseProject() {
         String[] names = new String[projects.size()];
-        for (int i = 0; i < names.length; i++) names[i] = projects.get(i).name;
+        for (int i = 0; i < names.length; i++) names[i] = displayProjectName(projects.get(i));
         new AlertDialog.Builder(this).setTitle(R.string.select_project)
             .setItems(names, (d, which) -> {
                 selectedId = projects.get(which).id;
