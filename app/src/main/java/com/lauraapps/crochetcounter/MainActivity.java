@@ -281,7 +281,7 @@ public class MainActivity extends Activity {
         progressBar.setMax(1000);
         progressBar.setProgressTintList(ColorStateList.valueOf(PINK));
         progressBar.setProgressBackgroundTintList(ColorStateList.valueOf(Color.rgb(240,229,245)));
-        progressBar.setMinHeight(dp(10));
+        progressBar.setMinimumHeight(dp(10));
         section(progress,progressBar,12);
         LinearLayout progressBtns = row();
         addWeighted(progressBtns,action("◎  " + getString(R.string.target),Color.rgb(247,239,252),PURPLE,this::setTarget),1,2);
