@@ -1,0 +1,30 @@
+<resources>
+<string name="app_name">Crochet Counter &amp; PDF</string>
+<string name="new_project">New project</string>
+<string name="project_name">Project name</string>
+<string name="create">Create</string>
+<string name="cancel">Cancel</string>
+<string name="delete">Delete project</string>
+<string name="delete_confirm">Delete this project?</string>
+<string name="rows">Rows</string>
+<string name="add_row">+ 1 row</string>
+<string name="undo">Undo</string>
+<string name="target">Row target</string>
+<string name="save">Save</string>
+<string name="open_pdf">Open PDF pattern</string>
+<string name="no_pdf">No PDF attached to this project</string>
+<string name="previous_page">Previous</string>
+<string name="next_page">Next</string>
+<string name="pdf_error">Could not open PDF. Select it again.</string>
+<string name="guide">Drag the pink reading guide over your pattern</string>
+<string name="project_default">My first project</string>
+<string name="progress">Progress: %1$d of %2$d rows</string>
+<string name="page">Page %1$d / %2$d</string>
+<string name="project">Project</string>
+<string name="select_project">Choose project</string>
+<string name="zoom_in">Zoom +</string>
+<string name="zoom_out">Zoom −</string>
+<string name="reset">Reset rows</string>
+<string name="reset_confirm">Reset row count to zero?</string>
+<string name="invalid_target">Enter a target greater than zero</string>
+</resources>
