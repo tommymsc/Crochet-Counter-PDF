@@ -3,6 +3,10 @@ package com.lauraapps.crochetcounter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.Context;
+import android.content.res.Configuration;
+import android.text.InputType;
+import java.util.Locale;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -62,7 +66,7 @@ public class MainActivity extends Activity {
         String id = UUID.randomUUID().toString();
         String name;
         String uri = "";
-        int rows = 0, target = 100, page = 0;
+        int rows = 0, target = 20, page = 0;
         float zoom = 1f, guide = .35f;
         JSONObject json() throws Exception {
             JSONObject o = new JSONObject();
@@ -77,7 +81,7 @@ public class MainActivity extends Activity {
             p.name = o.optString("name", "Project");
             p.uri = o.optString("uri", "");
             p.rows = Math.max(0, o.optInt("rows", 0));
-            p.target = Math.max(1, o.optInt("target", 100));
+            p.target = Math.max(1, o.optInt("target", 20));
             p.page = Math.max(0, o.optInt("page", 0));
             p.zoom = (float) Math.max(.75, Math.min(3, o.optDouble("zoom", 1)));
             p.guide = (float) Math.max(0, Math.min(1, o.optDouble("guide", .35)));
@@ -87,6 +91,39 @@ public class MainActivity extends Activity {
     private Project current() {
         for (Project p : projects) if (p.id.equals(selectedId)) return p;
         return projects.get(0);
+    }
+    @Override protected void attachBaseContext(Context base) {
+        String choice = base.getSharedPreferences("ui_settings", MODE_PRIVATE)
+            .getString("language", "system");
+        if (!choice.equals("es") && !choice.equals("en") && !choice.equals("pt")) {
+            super.attachBaseContext(base);
+            return;
+        }
+        Configuration config = new Configuration(base.getResources().getConfiguration());
+        config.setLocale(new Locale(choice));
+        super.attachBaseContext(base.createConfigurationContext(config));
+    }
+    private String languageCode() {
+        return getSharedPreferences("ui_settings", MODE_PRIVATE).getString("language", "system");
+    }
+    private void changeLanguage() {
+        final String[] choices = {getString(R.string.language_system), "Español", "English", "Português"};
+        final String[] codes = {"system", "es", "en", "pt"};
+        int selected = 0;
+        for (int i = 0; i < codes.length; i++) if (codes[i].equals(languageCode())) selected = i;
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.language_title)
+            .setSingleChoiceItems(choices, selected, (dialog, which) -> {
+                dialog.dismiss();
+                if (!codes[which].equals(languageCode())) {
+                    getSharedPreferences("ui_settings", MODE_PRIVATE).edit()
+                        .putString("language", codes[which]).apply();
+                    closePdf();
+                    recreate();
+                }
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
     }
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
@@ -225,6 +262,10 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams words = new LinearLayout.LayoutParams(0,-2,1);
         words.leftMargin = dp(8);
         header.addView(headerWords,words);
+        Button language = action("🌐",Color.rgb(241,230,249),PURPLE,this::changeLanguage);
+        language.setContentDescription(getString(R.string.language_title));
+        language.setTextSize(19);
+        header.addView(language,new LinearLayout.LayoutParams(dp(54),dp(48)));
         add(root,header);
 
         LinearLayout project = card();
@@ -249,7 +290,9 @@ public class MainActivity extends Activity {
         countView.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         countView.setGravity(Gravity.CENTER);
         add(hero,countView);
-        add(hero,text("✦  " + getString(R.string.target) + ": " + p.target,15,WHITE));
+        Button editGoal = action("✎  " + getString(R.string.goal_value,p.target),Color.rgb(126,82,166),WHITE,this::setTarget);
+        editGoal.setContentDescription(getString(R.string.change_target));
+        add(hero,editGoal);
         section(root,hero,12);
 
         Button plus = action("+  " + getString(R.string.add_row).replace("+ ",""),PURPLE,WHITE,() -> {
@@ -292,7 +335,7 @@ public class MainActivity extends Activity {
         barParams.topMargin = dp(8);
         progress.addView(progressBar,barParams);
         LinearLayout progressBtns = row();
-        addWeighted(progressBtns,action("◎  " + getString(R.string.target),Color.rgb(247,239,252),PURPLE,this::setTarget),1,2);
+        addWeighted(progressBtns,action("✎  " + getString(R.string.change_target),Color.rgb(247,239,252),PURPLE,this::setTarget),1,2);
         addWeighted(progressBtns,action("↺  " + getString(R.string.reset),Color.rgb(247,239,252),INK,
             () -> new AlertDialog.Builder(this).setMessage(R.string.reset_confirm)
                 .setPositiveButton(R.string.reset,(d,w)->changeRows(-current().rows))
@@ -396,8 +439,12 @@ public class MainActivity extends Activity {
     }
     private void setTarget() {
         EditText e = new EditText(this);
-        e.setInputType(2); e.setText(String.valueOf(current().target));
-        new AlertDialog.Builder(this).setTitle(R.string.target).setView(e)
+        e.setInputType(InputType.TYPE_CLASS_NUMBER);
+        e.setSelectAllOnFocus(true);
+        e.setSingleLine(true);
+        e.setText(String.valueOf(current().target));
+        e.setHint(R.string.target_hint);
+        new AlertDialog.Builder(this).setTitle(R.string.change_target).setMessage(R.string.target_explanation).setView(e)
             .setPositiveButton(R.string.save, (d,w) -> {
                 try {
                     int n = Integer.parseInt(e.getText().toString());
@@ -408,11 +455,25 @@ public class MainActivity extends Activity {
     }
     private void newProject() {
         EditText e = new EditText(this); e.setSingleLine(true);
-        new AlertDialog.Builder(this).setTitle(R.string.new_project).setView(e)
+        e.setHint(R.string.project_name);
+        EditText goal = new EditText(this);
+        goal.setInputType(InputType.TYPE_CLASS_NUMBER);
+        goal.setSingleLine(true);
+        goal.setHint(R.string.target_hint);
+        goal.setText("20");
+        LinearLayout fields = stack();
+        fields.setPadding(dp(18),0,dp(18),0);
+        add(fields,e);
+        add(fields,goal);
+        new AlertDialog.Builder(this).setTitle(R.string.new_project).setView(fields)
             .setPositiveButton(R.string.create, (d,w) -> {
                 String name = e.getText().toString().trim();
-                if (name.isEmpty()) return;
-                Project p = new Project(); p.name = name;
+                if (name.isEmpty()) { Toast.makeText(this,R.string.project_name,Toast.LENGTH_SHORT).show(); return; }
+                int target;
+                try { target = Integer.parseInt(goal.getText().toString().trim()); }
+                catch (NumberFormatException ex) { target = 20; }
+                if (target < 1) { Toast.makeText(this,R.string.invalid_target,Toast.LENGTH_SHORT).show(); return; }
+                Project p = new Project(); p.name = name; p.target = target;
                 projects.add(p); selectedId = p.id;
                 hasUndo = false; closePdf(); save(); build();
             }).setNegativeButton(R.string.cancel, null).show();
