@@ -1,0 +1,30 @@
+<resources>
+<string name="app_name">Contador de Crochê e PDF</string>
+<string name="new_project">Novo projeto</string>
+<string name="project_name">Nome do projeto</string>
+<string name="create">Criar</string>
+<string name="cancel">Cancelar</string>
+<string name="delete">Excluir projeto</string>
+<string name="delete_confirm">Excluir este projeto?</string>
+<string name="rows">Carreiras</string>
+<string name="add_row">+ 1 carreira</string>
+<string name="undo">Desfazer</string>
+<string name="target">Meta de carreiras</string>
+<string name="save">Salvar</string>
+<string name="open_pdf">Abrir receita PDF</string>
+<string name="no_pdf">Este projeto não tem PDF</string>
+<string name="previous_page">Anterior</string>
+<string name="next_page">Próxima</string>
+<string name="pdf_error">Não foi possível abrir o PDF. Selecione novamente.</string>
+<string name="guide">Arraste a guia rosa sobre a receita</string>
+<string name="project_default">Meu primeiro projeto</string>
+<string name="progress">Progresso: %1$d de %2$d carreiras</string>
+<string name="page">Página %1$d / %2$d</string>
+<string name="project">Projeto</string>
+<string name="select_project">Escolher projeto</string>
+<string name="zoom_in">Zoom +</string>
+<string name="zoom_out">Zoom −</string>
+<string name="reset">Zerar carreiras</string>
+<string name="reset_confirm">Zerar o contador?</string>
+<string name="invalid_target">Digite uma meta maior que zero</string>
+</resources>
