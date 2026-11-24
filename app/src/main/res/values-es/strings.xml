@@ -32,4 +32,11 @@
 <string name="pdf_purpose">Consulta las instrucciones de tu patrón PDF mientras cuentas vueltas, sin cambiar de aplicación.</string>
 <string name="pdf_help_title">¿Para qué sirve el PDF?</string>
 <string name="pdf_help_body">Si tienes un patrón de crochet guardado en PDF, ábrelo aquí. Puedes seguir sus instrucciones mientras cuentas vueltas, cambiar de página, ampliar y mover la guía rosada para marcar la línea por donde vas. El PDF permanece en tu dispositivo: la app no lo modifica ni crea nuevos PDF. Usarlo es opcional.</string>
+
+<string name="language_title">Idioma de la aplicación</string>
+<string name="language_system">Usar idioma del teléfono</string>
+<string name="change_target">Cambiar meta</string>
+<string name="goal_value">Meta: %1$d vueltas · Toca para editar</string>
+<string name="target_hint">Tu meta de vueltas (ej.: 25)</string>
+<string name="target_explanation">Indica cuántas vueltas necesita tu tejido. Cada proyecto tiene su propia meta y puedes cambiarla cuando quieras.</string>
 </resources>
