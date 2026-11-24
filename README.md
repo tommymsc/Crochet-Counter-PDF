@@ -12,10 +12,10 @@ Native Android crochet row counter and PDF pattern reader. Offline-first, no acc
 - Privacy-friendly: no internet permission, tracking, analytics or ads
 
 ## Build
-Requires JDK 17 and Android SDK 35.
+Requires JDK 17, Android SDK 35, and Gradle 8.9.
 
 ```bash
-./gradlew assembleDebug
+gradle assembleDebug
 ```
 
 A GitHub Actions workflow builds a downloadable debug APK on pushes and pull requests.
