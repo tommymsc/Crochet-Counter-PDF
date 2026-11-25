@@ -1,5 +1,5 @@
 <resources>
-<string name="app_name">Contador Crochet y PDF</string>
+<string name="app_name">Crochet: Contador de Vueltas</string>
 <string name="new_project">Nuevo proyecto</string>
 <string name="project_name">Nombre del proyecto</string>
 <string name="create">Crear</string>
@@ -41,4 +41,5 @@
 <string name="target_explanation">Indica cuántas vueltas necesita tu tejido. Cada proyecto tiene su propia meta y puedes cambiarla cuando quieras.</string>
 <string name="header_title">Contador de Crochet</string>
 <string name="header_subtitle">Cuenta vueltas · Sigue patrones PDF</string>
+<string name="ad_privacy">Opciones de privacidad publicitaria</string>
 </resources>
