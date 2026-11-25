@@ -1,5 +1,5 @@
 <resources>
-<string name="app_name">Crochet Counter &amp; PDF</string>
+<string name="app_name">Crochet Row Counter &amp; PDF</string>
 <string name="new_project">New project</string>
 <string name="project_name">Project name</string>
 <string name="create">Create</string>
@@ -41,4 +41,5 @@
 <string name="target_explanation">Choose how many rows your project needs. Each project can have a different goal; you can change it at any time.</string>
 <string name="header_title">Crochet Counter</string>
 <string name="header_subtitle">Count rows · Follow PDF patterns</string>
+<string name="ad_privacy">Ad privacy options</string>
 </resources>
