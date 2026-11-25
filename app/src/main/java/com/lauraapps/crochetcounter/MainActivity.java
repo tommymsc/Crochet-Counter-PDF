@@ -44,6 +44,7 @@ public class MainActivity extends Activity {
     private String selectedId;
     private SharedPreferences prefs;
     private LinearLayout root;
+    private AdsController ads;
     private TextView countView, progressView, pageView, percentageView;
     private ProgressBar progressBar;
     private Button undoButton;
@@ -139,7 +140,9 @@ public class MainActivity extends Activity {
         getWindow().setNavigationBarColor(Color.rgb(54, 33, 61));
         prefs = getSharedPreferences("projects_v1", MODE_PRIVATE);
         load();
+        ads = new AdsController(this);
         build();
+        ads.start();
     }
     private void load() {
         try {
@@ -257,7 +260,17 @@ public class MainActivity extends Activity {
         sc.setFillViewport(true);
         sc.setClipToPadding(false);
         sc.addView(root);
-        setContentView(sc);
+        LinearLayout outer = stack();
+        outer.setBackgroundColor(LIGHT);
+        outer.setFitsSystemWindows(true);
+        outer.addView(sc, new LinearLayout.LayoutParams(-1,0,1));
+        LinearLayout adHost = stack();
+        adHost.setPadding(0,dp(12),0,dp(8));
+        outer.addView(adHost,new LinearLayout.LayoutParams(-1,-2));
+        Button privacy = button(getString(R.string.ad_privacy), () -> {});
+        add(adHost,privacy);
+        setContentView(outer);
+        if (ads != null) ads.bind(adHost,privacy);
 
         LinearLayout header = row();
         ImageView symbol = new ImageView(this);
@@ -492,8 +505,10 @@ public class MainActivity extends Activity {
         for (int i = 0; i < names.length; i++) names[i] = displayProjectName(projects.get(i));
         new AlertDialog.Builder(this).setTitle(R.string.select_project)
             .setItems(names, (d, which) -> {
+                boolean changed = !selectedId.equals(projects.get(which).id);
                 selectedId = projects.get(which).id;
                 hasUndo = false; closePdf(); save(); build();
+                if (changed && ads != null) root.postDelayed(() -> { if (ads != null && !isFinishing()) ads.projectTransition(); }, 350);
             }).show();
     }
     private void deleteProject() {
@@ -594,5 +609,7 @@ public class MainActivity extends Activity {
         if (file != null) { try { file.close(); } catch (Exception ignored) {} file = null; }
         openedUri = "";
     }
-    @Override protected void onDestroy() { closePdf(); super.onDestroy(); }
+    @Override protected void onPause() { if (ads != null) ads.pause(); super.onPause(); }
+    @Override protected void onResume() { super.onResume(); if (ads != null) ads.resume(); }
+    @Override protected void onDestroy() { if (ads != null) { ads.destroy(); ads = null; } closePdf(); super.onDestroy(); }
 }
