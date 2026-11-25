@@ -1,5 +1,5 @@
 <resources>
-<string name="app_name">Contador de Crochê e PDF</string>
+<string name="app_name">Crochê: Contador de Carreiras</string>
 <string name="new_project">Novo projeto</string>
 <string name="project_name">Nome do projeto</string>
 <string name="create">Criar</string>
@@ -41,4 +41,5 @@
 <string name="target_explanation">Escolha quantas carreiras o projeto precisa. Cada projeto tem sua própria meta e você pode alterá-la quando quiser.</string>
 <string name="header_title">Contador de Crochê</string>
 <string name="header_subtitle">Conte carreiras · Siga receitas PDF</string>
+<string name="ad_privacy">Opções de privacidade de anúncios</string>
 </resources>
