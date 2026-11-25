@@ -8,8 +8,8 @@ android {
         applicationId = "com.lauraapps.crochetcounter"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.3.0"
+        versionCode = 8
+        versionName = "1.3.1"
         buildConfigField("boolean", "LIVE_ADS", (project.findProperty("liveAds") == "true").toString())
     }
     buildFeatures { buildConfig = true }
