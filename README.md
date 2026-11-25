@@ -1,4 +1,4 @@
-# Crochet Counter & PDF
+# Crochet Row Counter & PDF
 
 Native Android crochet row counter and PDF pattern reader. Offline-first, no account, no server.
 
@@ -9,10 +9,10 @@ Native Android crochet row counter and PDF pattern reader. Offline-first, no acc
 - Import a PDF pattern with the Android document picker
 - Remember imported PDF access, PDF page, zoom and reading guide position
 - English, Spanish and Portuguese localization
-- Privacy-friendly: no internet permission, tracking, analytics or ads
+- Local projects and PDFs; optional network access for consent and advertising
 
 ## Build
-Requires JDK 17, Android SDK 35, and Gradle 8.9.
+Requires JDK 17, Android SDK 36, and Gradle 8.11.1.
 
 ```bash
 gradle assembleDebug
@@ -25,3 +25,6 @@ Test opening multipage PDFs, document permission persistence, device rotation, p
 
 ## License
 All rights reserved, LauraApps.
+
+## Play release
+Run Play release AAB manually. Default uses Google demo ads; enable live_ads only for production. Configure upload signing secrets as documented in the workflow. Configure AdMob privacy messages before release.
