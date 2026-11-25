@@ -18,7 +18,8 @@ final class AdsController {
     private Button privacy;
     private boolean started, ready, destroyed, loading, showing;
     private int transitions;
-    private long lastShown = SystemClock.elapsedRealtime();
+    private long lastShown = -1L;
+    private long loadedAt;
     private static final String BANNER = BuildConfig.LIVE_ADS ? "ca-app-pub-2506564165861733/2077507499" : "ca-app-pub-3940256099942544/6300978111";
     private static final String INTERSTITIAL = BuildConfig.LIVE_ADS ? "ca-app-pub-2506564165861733/5222866382" : "ca-app-pub-3940256099942544/1033173712";
 
@@ -78,15 +79,19 @@ final class AdsController {
         if (!ready || destroyed || loading || interstitial != null || !consent.canRequestAds()) return;
         loading = true;
         InterstitialAd.load(activity, INTERSTITIAL, new AdRequest.Builder().build(), new InterstitialAdLoadCallback() {
-            @Override public void onAdLoaded(InterstitialAd ad) { loading = false; if (!destroyed) interstitial = ad; }
+            @Override public void onAdLoaded(InterstitialAd ad) { loading = false; if (!destroyed && consent.canRequestAds()) { interstitial = ad; loadedAt = SystemClock.elapsedRealtime(); } }
             @Override public void onAdFailedToLoad(LoadAdError error) { loading = false; }
         });
     }
-    void projectTransition() {
+    void projectCreated() { maybeShow(true); }
+    void projectTransition() { maybeShow(false); }
+    private void maybeShow(boolean created) {
         transitions++;
         if (destroyed || showing || !consent.canRequestAds()) return;
+        long now = SystemClock.elapsedRealtime();
+        if (interstitial != null && now - loadedAt >= 3600000L) interstitial = null;
         if (interstitial == null) { loadInterstitial(); return; }
-        if (transitions < 3 || SystemClock.elapsedRealtime() - lastShown < 180000L || !activity.hasWindowFocus()) return;
+        if ((!created && transitions < 3) || (lastShown >= 0 && now - lastShown < 180000L) || !activity.hasWindowFocus() || activity.isFinishing() || activity.isDestroyed()) return;
         InterstitialAd ad = interstitial; interstitial = null;
         showing = true; transitions = 0; lastShown = SystemClock.elapsedRealtime();
         ad.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -96,6 +101,6 @@ final class AdsController {
         ad.show(activity);
     }
     void pause() { if (banner != null) banner.pause(); }
-    void resume() { if (banner != null) banner.resume(); }
+    void resume() { if (banner != null) banner.resume(); loadInterstitial(); }
     void destroy() { destroyed = true; if (banner != null) banner.destroy(); banner = null; interstitial = null; host = null; privacy = null; }
 }
