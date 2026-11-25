@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     private SharedPreferences prefs;
     private LinearLayout root;
     private AdsController ads;
-    private TextView countView, progressView, pageView, percentageView;
+    private TextView countView, progressView, pageView, percentageView, goalCelebration;
     private ProgressBar progressBar;
     private Button undoButton;
     private ImageView pdfImage;
@@ -315,6 +315,10 @@ public class MainActivity extends Activity {
         Button editGoal = action("✎  " + getString(R.string.goal_value,p.target),Color.rgb(126,82,166),WHITE,this::setTarget);
         editGoal.setContentDescription(getString(R.string.change_target));
         add(hero,editGoal);
+        goalCelebration = text(getString(R.string.goal_celebration), 14, WHITE);
+        goalCelebration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        goalCelebration.setVisibility(p.rows >= p.target ? View.VISIBLE : View.GONE);
+        add(hero, goalCelebration);
         section(root,hero,12);
 
         Button plus = action("+  " + getString(R.string.add_row).replace("+ ",""),PURPLE,WHITE,() -> {
@@ -443,14 +447,24 @@ public class MainActivity extends Activity {
         if (percentageView != null) percentageView.setText(Math.min(100,100L*p.rows/p.target) + "%");
         if (progressBar != null) progressBar.setProgress((int)Math.min(1000, 1000L * p.rows / p.target));
         if (undoButton != null) undoButton.setEnabled(hasUndo);
+        if (goalCelebration != null) goalCelebration.setVisibility(p.rows >= p.target ? View.VISIBLE : View.GONE);
     }
     private void changeRows(int amount) {
         Project p = current();
         int newRows = (int) Math.max(0, Math.min(Integer.MAX_VALUE, (long) p.rows + amount));
         if (newRows == p.rows) return;
         lastValue = p.rows; hasUndo = true;
+        boolean reached = p.rows < p.target && newRows >= p.target;
         p.rows = newRows;
         save(); updateCounter();
+        if (reached && goalCelebration != null) {
+            goalCelebration.animate().cancel();
+            goalCelebration.setAlpha(0f);
+            goalCelebration.setScaleX(.86f);
+            goalCelebration.setScaleY(.86f);
+            goalCelebration.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(420).start();
+            goalCelebration.announceForAccessibility(getString(R.string.goal_celebration));
+        }
     }
     private void undo() {
         if (!hasUndo) return;
@@ -498,6 +512,7 @@ public class MainActivity extends Activity {
                 Project p = new Project(); p.name = name; p.target = target;
                 projects.add(p); selectedId = p.id;
                 hasUndo = false; closePdf(); save(); build();
+                if (ads != null) root.postDelayed(() -> { if (ads != null && !isFinishing() && !isDestroyed()) ads.projectCreated(); }, 350);
             }).setNegativeButton(R.string.cancel, null).show();
     }
     private void chooseProject() {
